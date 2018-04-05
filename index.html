@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="vue.js"></script>
+    
+</head>
+<body style="padding: 10px 10px;">
+    <div id ="grid" >
+        <button v-if="showingBtnCreate" @click="showingMap= true">Create map</button><br>
+        <button v-if="showingBtnMap" v-on:click="TestuniverseMapNumber">Next map</button>
+        <button v-if="showingBtnMap2" v-on:click="TestuniverseMapNumber2">Next map</button>
+        <br>
+        
+        <div v-if="showingMap" v-for="(item, index) in Mapresult">
+            <div v-for="i in 70" v-bind:class="'xxx-' + item[i-1]"></div>
+        </div>
+        
+        <div v-if="showingNewMap">
+            <div v-for="(item, index) in ChangeMapresult">
+                <div v-for="i in 70" v-bind:class="'xxx-' + item[i-1]"></div>
+            </div>
+        </div>
+
+        <div v-if="showingNewMap2">
+            <div v-for="(item, index) in ChangeMapresult">
+                <div v-for="i in 70" v-bind:class="'xxx-' + item[i-1]"></div>
+            </div>
+        </div>
+    </div>                                                                                                
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<script type="text/javascript">
+    var newmap = [];
+    new Vue ({
+        el: '#grid',
+        data: {
+            result: newmap,
+            showingBtnCreate: true,
+            showingMap: false,
+            showingNewMap: false,
+            showingNewMap2: false,
+            showingBtnMap: false,
+            showingBtnMap2: true
+        },
+
+        methods: {
+            createResult: function() {
+                for (var i = 0 ; i < 70; i++) {
+                    this.result[i] = [];
+                    for (var j = 0; j < 70; j++) {
+                        this.result[i][j] = Math.round(Math.random());
+                    }
+                }
+                return this.result;
+            },
+
+            getValueOfCell: function (x, y) {
+                if (x < 0 || x >= 70 || y < 0 || y >= 70) {
+                    return 0;
+                }
+                else {
+                    return this.result[x][y];
+                }
+            },
+
+            countNeighborPlanet: function (i, j) {
+                return parseInt(this.getValueOfCell((i - 1), (j - 1))) + parseInt(this.getValueOfCell((i - 1), j)) + parseInt(this.getValueOfCell((i - 1), (j + 1))) + parseInt(this.getValueOfCell(i, (j - 1))) + parseInt(this.getValueOfCell(i, (j + 1))) + parseInt(this.getValueOfCell((i + 1), (j - 1))) + parseInt(this.getValueOfCell((i + 1), j)) + parseInt(this.getValueOfCell((i + 1), (j + 1))) ;
+            },
+
+            calculateCellState: function (i, j) {
+                this.showingMap = false;
+                if (this.countNeighborPlanet(i, j) < 2 || this.countNeighborPlanet(i, j) > 3) {
+                    this.result[i][j] = 0;
+                } else if (this.countNeighborPlanet(i, j) == 3) {
+                    this.result[i][j] = 1;
+                }
+            },
+
+            TestuniverseMapNumber: function () {
+                this.showingNewMap = false;
+                this.showingNewMap2 = true;
+                this.showingBtnMap = false;
+                this.showingBtnMap2 = true;
+                this.showingBtnCreate = false;
+                for (var i = 0 ; i < 70; i++) {
+                    for (var j = 0; j < 70; j++) {
+                        this.calculateCellState(i, j);
+                    }
+                }
+                return this.result;
+            },
+
+            TestuniverseMapNumber2: function () {
+                this.showingNewMap2 = false;
+                this.showingNewMap = true;
+                this.showingBtnMap2 = false;
+                this.showingBtnMap = true;
+                this.showingBtnCreate = false;
+                for (var i = 0 ; i < 70; i++) {
+                    for (var j = 0; j < 70; j++) {
+                        this.calculateCellState(i, j);
+                    }
+                }
+                return this.result;
+            }
+        },
+
+        computed: {
+            Mapresult: function () {
+                return this.createResult();
+            },
+
+            universeMapNumber: function () {
+                this.showingMap = false;
+                for (var i = 0 ; i < 70; i++) {
+                    for (var j = 0; j < 70; j++) {
+                        this.calculateCellState(i, j);
+                    }
+                }
+                return this.result;
+            },
+
+            ChangeMapresult: function () {
+                this.showingNewMap2 = true;
+                return this.TestuniverseMapNumber();
+            }
+        }
+    });
+</script>
+</html>
